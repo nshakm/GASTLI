@@ -191,10 +191,12 @@ class coupling:
                 self.myatmmodel.calc_interior_mass_fraction(self.Tint, self.g_surf_planet, self.Teq, self.CO_pl,\
                                                             self.log_FeH,P_surf=P_surf)
                 self.Zenv = self.myatmmodel.MMF_surf
+                print("Coupling.py: MMF_surf intialised!")
 
 
 
             self.myplanet.calc_radius(self.M_P,self.x_core,x_H2O,self.T_surf,P_surf*1e5,self.Zenv)
+            print("Coupling.py: calc_radius done!")
 
             """
             print('')
@@ -216,7 +218,7 @@ class coupling:
 
             # Update surface gravity
             self.g_surf_planet = 100 * 9.8 * self.M_P/self.myplanet.R_P**2   # In cm/s2
-
+            print("Coupling.py: g_surf_planet done!")
 
             # Atm model
             if FeH_flag == True:
@@ -224,6 +226,7 @@ class coupling:
             else:
                 self.myatmmodel.calc_PTprofile(self.Tint, self.g_surf_planet, self.Teq, self.Zenv, FeH_flag=False,\
                                                CO_def=self.CO_pl,guillot=guillot,P_surf=P_surf)
+            print("Coupling.py: calc_PTprofile done!")
 
             """
             print('Atm. models from prt')
@@ -245,7 +248,7 @@ class coupling:
 
 
         print("")
-        print("Convergence reached in surface temperature and bulk radius")
+        print("Coupling.py: Convergence reached in surface temperature and bulk radius")
         print("")
 
         #print("Tsurf_arr = ", Tsurf_arr)
@@ -274,9 +277,12 @@ class coupling:
 
 
         self.myatmmodel.calc_thickness(self.Rbulk_Rjup,self.Matm_earthunits)
+        print("Coupling.py: calc_thickness done!")
 
 
         self.Rtot = self.myatmmodel.total_radius
+        print("Coupling.py: R_tot done!")
+
         """
         self.r_atm_profile = self.myatmmodel.r
         self.g_atm_profile = self.myatmmodel.g_ode

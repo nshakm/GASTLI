@@ -10,6 +10,7 @@ import math
 from scipy import integrate
 from scipy import interpolate
 from scipy.integrate import odeint
+import warnings #for ODEintWarning
 
 
 
@@ -26,6 +27,16 @@ class thermal_evolution:
                 Default is 0.32. Increase if planet is very massive (greater than 5 Jupiter masses aprox). Decrease if
                 core mass fraction is very low (< 0.03 approx.) and/or planet is low mass (15-20 Earth masses approx.)
         """
+
+        print("\n\n\nREPO GASTLI\n\n\n")
+
+        # print("1. RGI np.nan\n\n\n")
+        # print("2. RGI np.nan + no sys.exit(1)\n\n\n")
+
+        # print("1. RGI None + no sys.esxit(1) + raise ValueError + try/except\n\n\n")
+        # print("2. RGI 5 + no sys.exit(1) + raise ValueError + try/except\n\n\n")
+        # print("3. RGI None + no sys.exit(1) + raise Exception + try/except\n\n\n")
+        # print("4. RGI None + no sys.exit(1) + raise Exception + continue + try/except\n\n\n")
 
         self.pow_law_formass = pow_law_formass
 
@@ -135,18 +146,24 @@ class thermal_evolution:
         self.L_TE = np.zeros(n_therm)
         self.f_S = np.zeros(n_therm)
 
+        #adding this
+        # self.tmm = np.zeros(n_therm) #actually maybe not needed
+        self.age_points = np.zeros(n_therm)
+
         # more
         self.Zenv_TE = np.zeros(n_therm)
 
+        errors = []
 
         for i in range(0,n_therm):
-
-            print("Model # ", i+1, " in total time sequence of ", n_therm)
-            print("Internal temperature [K] = ", self.Tint_array[i])
+            print("--------------------------")
+            print("Thermal_evolution.py: Model # ", i+1, " in total time sequence of ", n_therm)
+            print("Thermal_evolution.py: Internal temperature [K] = ", self.Tint_array[i])
             print("")
 
             # Putting it here adds 1-2 secs more per each Tint computation, but it is safer
             # Create coupling class
+            print("Thermal_evolution.py: Creating coupling class")
             self.my_coupling = cpl.coupling(pow_law_formass=self.pow_law_formass,\
                                             name_grid=name_grid,j_max=j_max)
 
@@ -160,67 +177,190 @@ class thermal_evolution:
             else:
                 Psurf_for_this_run = P_surf[i]
 
-
-            # Call to interior model
-            if FeH_flag==True:
-                self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
-                                      log_FeH=self.logFeH, Tguess=Tguess, Rguess=Rguess,\
-                                      tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
-            else:
-                self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
-                                      FeH_flag=False, Zenv=self.Zenv, Rguess=Rguess,\
-                                      Tguess=Tguess, tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
-
-
-            # Entropy
-            S = self.my_coupling.myplanet.entropy
-            #i_top = self.my_coupling.myplanet.intrf[2] - 1
-            i_core_env_bound = self.my_coupling.myplanet.intrf[1] - 1
-            press = self.my_coupling.myplanet.P
-            i_top = maxloc(press, 1e3*1e5)
-            #index_find = np.where(press <= 1e3*1e5)
-            #i_top = index_find[0]
-
-            self.s_top_TE[i] = S[i_top]
-            self.s_mean_TE[i] = np.mean(S[i_core_env_bound:i_top])
-            self.Mtot_TE[i] = self.my_coupling.Mtot
-            self.Rtot_TE[i] = self.my_coupling.Rtot
-            self.Rbulk_TE[i] = self.my_coupling.Rbulk_Rjup
-            self.Tsurf_TE[i] = self.my_coupling.T_surf
-
-            self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl
-
-            """
-            print(self.Mtot_TE)
-            print(self.Rtot_TE)
-            print(self.Rbulk_TE)
-            print(self.Tsurf_TE)
-            print(self.s_mean_TE)
-            """
+            # Use try/except to handle ValueError
+            try:
+                # Call to interior model
+                if FeH_flag==True:
+                    print("Thermal_evolution.py: calc_PTprofile with FeH_flag = True")
+                    self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
+                                        log_FeH=self.logFeH, Tguess=Tguess, Rguess=Rguess,\
+                                        tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
+                else:
+                    print("Thermal_evolution.py: calc_PTprofile with FeH_flag = False")
+                    self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
+                                        FeH_flag=False, Zenv=self.Zenv, Rguess=Rguess,\
+                                        Tguess=Tguess, tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
 
 
-            # Luminosity
-            self.L_TE[i] = 4. * math.pi * self.sigma * (self.Rbulk_TE[i] * self.R_jup * self.R_earth) ** 2\
-                   * self.Tint_array[i] ** 4
+                # Entropy
+                S = self.my_coupling.myplanet.entropy
+                #i_top = self.my_coupling.myplanet.intrf[2] - 1
+                i_core_env_bound = self.my_coupling.myplanet.intrf[1] - 1
+                press = self.my_coupling.myplanet.P
+                i_top = maxloc(press, 1e3*1e5)
+                #index_find = np.where(press <= 1e3*1e5)
+                #i_top = index_find[0]
+
+                self.s_top_TE[i] = S[i_top]
+                self.s_mean_TE[i] = np.mean(S[i_core_env_bound:i_top])
+                self.Mtot_TE[i] = self.my_coupling.Mtot
+                self.Rtot_TE[i] = self.my_coupling.Rtot
+                self.Rbulk_TE[i] = self.my_coupling.Rbulk_Rjup
+                self.Tsurf_TE[i] = self.my_coupling.T_surf
+
+                self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl
+
+                """
+                print(self.Mtot_TE)
+                print(self.Rtot_TE)
+                print(self.Rbulk_TE)
+                print(self.Tsurf_TE)
+                print(self.s_mean_TE)
+                """
 
 
-            # f = dt/dS function
-            r = self.my_coupling.myplanet.r[0:i_top]
-            rho = self.my_coupling.myplanet.rho[0:i_top]
-            temp = self.my_coupling.myplanet.T[0:i_top]
-
-            m = np.zeros_like(r)
-
-            for j in range(0, i_top):
-                r_prim = r[0:j]
-                rho_prim = rho[0:j]
-                func_m = 4 * math.pi * r_prim ** 2 * rho_prim
-                integ_m = integrate.trapezoid(func_m, x=r_prim)
-                m[j] = integ_m / (self.M_P * self.M_earth)
-
-            self.f_S[i] = (-1) * (self.M_P*self.M_earth)/self.L_TE[i] * integrate.trapezoid(temp, x=m)
+                # Luminosity
+                self.L_TE[i] = 4. * math.pi * self.sigma * (self.Rbulk_TE[i] * self.R_jup * self.R_earth) ** 2\
+                    * self.Tint_array[i] ** 4
 
 
+                # f = dt/dS function
+                r = self.my_coupling.myplanet.r[0:i_top]
+                rho = self.my_coupling.myplanet.rho[0:i_top]
+                temp = self.my_coupling.myplanet.T[0:i_top]
+
+                m = np.zeros_like(r)
+
+                for j in range(0, i_top):
+                    r_prim = r[0:j]
+                    rho_prim = rho[0:j]
+                    func_m = 4 * math.pi * r_prim ** 2 * rho_prim
+                    integ_m = integrate.trapezoid(func_m, x=r_prim)
+                    m[j] = integ_m / (self.M_P * self.M_earth)
+
+                self.f_S[i] = (-1) * (self.M_P*self.M_earth)/self.L_TE[i] * integrate.trapezoid(temp, x=m)
+
+            except ValueError as e:
+                print('-----')
+                print(f"Error in model #{i+1}/{n_therm}")
+                print("Assinging np.nan to all values")
+
+                self.f_S[i] = np.nan
+                self.s_mean_TE[i] = np.nan
+                self.s_top_TE[i] = np.nan
+                self.Tint_array[i] = self.Tint_array[i] #keep this as expected
+                self.Rtot_TE[i] = np.nan
+                self.Rbulk_TE[i] = np.nan
+                self.Tsurf_TE[i] = np.nan
+                # self.age_points[i] = np.nan #handle this in the solve_thermal_evol_eq function
+                self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl #keep this as expected
+                self.Mtot_TE[i] = np.nan
+                # self.tmm[i] = np.nan
+
+                # print((self.tmm[i]))
+                # print(e)
+                print(f"Assignment of np.nan values complete for model #{i+1}/{n_therm}")
+                print('-----')
+                print("\n\n")
+                continue
+
+
+        #     # Call to interior model
+        #     try:
+        #         if FeH_flag==True:
+        #             print("Thermal_evolution.py: calc_PTprofile with FeH_flag = True")
+        #             self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
+        #                                 log_FeH=self.logFeH, Tguess=Tguess, Rguess=Rguess,\
+        #                                 tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
+        #         else:
+        #             print("Thermal_evolution.py: calc_PTprofile with FeH_flag = False")
+        #             self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
+        #                                 FeH_flag=False, Zenv=self.Zenv, Rguess=Rguess,\
+        #                                 Tguess=Tguess, tolerance=tolerance_for_this_run,P_surf=Psurf_for_this_run)
+
+
+        #         # Entropy
+        #         S = self.my_coupling.myplanet.entropy
+        #         #i_top = self.my_coupling.myplanet.intrf[2] - 1
+        #         i_core_env_bound = self.my_coupling.myplanet.intrf[1] - 1
+        #         press = self.my_coupling.myplanet.P
+        #         i_top = maxloc(press, 1e3*1e5)
+        #         #index_find = np.where(press <= 1e3*1e5)
+        #         #i_top = index_find[0]
+
+        #         self.s_top_TE[i] = S[i_top]
+        #         self.s_mean_TE[i] = np.mean(S[i_core_env_bound:i_top])
+        #         self.Mtot_TE[i] = self.my_coupling.Mtot
+        #         self.Rtot_TE[i] = self.my_coupling.Rtot
+        #         self.Rbulk_TE[i] = self.my_coupling.Rbulk_Rjup
+        #         self.Tsurf_TE[i] = self.my_coupling.T_surf
+
+        #         self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl
+
+        #         """
+        #         print(self.Mtot_TE)
+        #         print(self.Rtot_TE)
+        #         print(self.Rbulk_TE)
+        #         print(self.Tsurf_TE)
+        #         print(self.s_mean_TE)
+        #         """
+
+
+        #         # Luminosity
+        #         self.L_TE[i] = 4. * math.pi * self.sigma * (self.Rbulk_TE[i] * self.R_jup * self.R_earth) ** 2\
+        #             * self.Tint_array[i] ** 4
+
+
+        #         # f = dt/dS function
+        #         r = self.my_coupling.myplanet.r[0:i_top]
+        #         rho = self.my_coupling.myplanet.rho[0:i_top]
+        #         temp = self.my_coupling.myplanet.T[0:i_top]
+
+        #         m = np.zeros_like(r)
+
+        #         for j in range(0, i_top):
+        #             r_prim = r[0:j]
+        #             rho_prim = rho[0:j]
+        #             func_m = 4 * math.pi * r_prim ** 2 * rho_prim
+        #             integ_m = integrate.trapezoid(func_m, x=r_prim)
+        #             m[j] = integ_m / (self.M_P * self.M_earth)
+
+        #         self.f_S[i] = (-1) * (self.M_P*self.M_earth)/self.L_TE[i] * integrate.trapezoid(temp, x=m)
+
+        #     except ValueError as e: #for when calc_metal_mass_fraction or calc_PTprofile raises ValueError for there being nan values
+        #         print(f"Thermal_evolution.py: Error in model #{i + 1}/{n_therm}: {e}")
+        #         self.age_points[i] = np.nan
+
+        #         errors.append(RuntimeError(f"Thermal_evolution.py: Error in thermal evolution model #{i + 1}"))
+        #         # continue
+
+        #         # raise RuntimeWarning("RuntimeWarning") from e
+        #     #     print('-----')
+        #     #     print(f"Error in model #{i+1}/{n_therm}")
+        #     #     # print("Assinging np.nan to all values")
+
+        #     #     # self.f_S[i] = np.nan
+        #     #     # self.s_mean_TE[i] = np.nan
+        #     #     # self.s_top_TE[i] = np.nan
+        #     #     # self.Tint_array[i] = self.Tint_array[i] #keep this as expected
+        #     #     # self.Rtot_TE[i] = np.nan
+        #     #     # self.Rbulk_TE[i] = np.nan
+        #     #     # self.Tsurf_TE[i] = np.nan
+        #     #     # # self.age_points[i] = np.nan #handle this in the solve_thermal_evol_eq function
+        #     #     # self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl #keep this as expected
+        #     #     # self.Mtot_TE[i] = np.nan
+        #     #     # # self.tmm[i] = np.nan
+
+        #     #     # print((self.tmm[i]))
+        #     #     # print(e)
+        #     #     # print(f"Assignment of np.nan values complete for model #{i+1}/{n_therm}")
+        #     #     # print('-----')
+        #     #     # print("\n\n")
+        #         # continue
+
+        # # # Raise all collected errors after the loop
+        # # if errors:
+        # #     raise RuntimeError("Errors occurred during thermal evolution") from errors[0]
 
     def solve_thermal_evol_eq(self,t_Gyr=np.linspace(2.1e-6, 15., 100), S0=12.):
         r"""This function solves the luminosity differential equation to calculate the age corresponding to the
@@ -247,11 +387,6 @@ class thermal_evolution:
         self.t_Gyr = t_Gyr
         self.S0 = S0
 
-        # dS/dt
-        inv_f_S = 1 / self.f_S
-        #dSdt_func_interp = interpolate.interp1d(self.s_mean_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
-        dSdt_func_interp = interpolate.interp1d(self.s_top_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
-
         def dSdt_func(y, t):
             '''
             Calculates the derivative dS/dt
@@ -261,6 +396,70 @@ class thermal_evolution:
             '''
             dSdt = dSdt_func_interp(y)
             return dSdt
+
+        # dS/dt
+        # inv_f_S = 1 / self.f_S
+
+        print("Thermal evolution.py: Trying 1/f_S")
+        inv_f_S = 1 / self.f_S
+        # if np.any(self.f_S == 0):
+        #     print("Thermal evolution.py: self.f_S contains zeros, which will cause division by zero.")
+
+        #     for i in range(len(self.f_S)): 
+        #         self.f_S[i] = np.nan
+        #         self.s_mean_TE[i] = np.nan
+        #         self.s_top_TE[i] = np.nan
+        #         self.Tint_array[i] = self.Tint_array[i] #keep this as expected
+        #         self.Rtot_TE[i] = np.nan
+        #         self.Rbulk_TE[i] = np.nan
+        #         self.Tsurf_TE[i] = np.nan
+        #         # self.age_points[i] = np.nan #handle this in the solve_thermal_evol_eq function
+        #         self.Zenv_TE[i] = self.my_coupling.myatmmodel.Zenv_pl #keep this as expected
+        #         self.Mtot_TE[i] = np.nan
+        #         # self.tmm[i] = np.nan
+        #     raise ValueError("Thermal evolution.py: self.f_S contains zeros, assiging np.nan to all values")
+        
+        # else:
+        #     print("Thermal evolution.py: 1/f_S is ok")
+
+        #     print("Thermal evolution.py: Trying dSdt_func_interp")
+        #     #dSdt_func_interp = interpolate.interp1d(self.s_mean_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        #     dSdt_func_interp = interpolate.interp1d(self.s_top_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        #     print("Thermal evolution.py: dSdt_func_interp is ok")
+
+        #     # Conversion from Gyr to seconds
+        #     t = self.t_Gyr * self.s_conv
+
+        #     # Initial condition
+        #     y0 = self.S0 * self.kb / self.m_h
+
+        #     # ODE solver
+        #     odeint_sol = odeint(dSdt_func, y0, t)
+        #     self.S_solution = odeint_sol[:,0]
+        #     # print("S_solution shape = ",self.S_solution.shape)
+        #     # print("t_Gyr shape = ", self.t_Gyr.shape)
+
+        #     #Tint_func = interpolate.interp1d(self.s_mean_TE, self.Tint_array, bounds_error=False, fill_value="extrapolate")
+        #     Tint_func = interpolate.interp1d(self.s_top_TE, self.Tint_array, bounds_error=False, fill_value="extrapolate")
+        #     self.Tint_solution = Tint_func(self.S_solution)
+
+        #     # Rtot_func = interpolate.interp1d(self.s_mean_TE, self.Rtot_TE, bounds_error=False, fill_value="extrapolate")
+        #     Rtot_func = interpolate.interp1d(self.s_top_TE, self.Rtot_TE, bounds_error=False, fill_value="extrapolate")
+        #     self.Rtot_solution = Rtot_func(self.S_solution)
+
+        #     # age points at Tint
+        #     age_func = interpolate.interp1d(self.S_solution, self.t_Gyr, bounds_error=False, fill_value="extrapolate")
+        #     #self.age_points = age_func(self.s_mean_TE)
+        #     self.age_points = age_func(self.s_top_TE)
+
+
+        inv_f_S = 1 / self.f_S
+        print("Thermal evolution.py: 1/f_S is ok")
+
+        print("Thermal evolution.py: Trying dSdt_func_interp")
+        #dSdt_func_interp = interpolate.interp1d(self.s_mean_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        dSdt_func_interp = interpolate.interp1d(self.s_top_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        print("Thermal evolution.py: dSdt_func_interp is ok")
 
         # Conversion from Gyr to seconds
         t = self.t_Gyr * self.s_conv
@@ -278,7 +477,7 @@ class thermal_evolution:
         Tint_func = interpolate.interp1d(self.s_top_TE, self.Tint_array, bounds_error=False, fill_value="extrapolate")
         self.Tint_solution = Tint_func(self.S_solution)
 
-        #Rtot_func = interpolate.interp1d(self.s_mean_TE, self.Rtot_TE, bounds_error=False, fill_value="extrapolate")
+        # Rtot_func = interpolate.interp1d(self.s_mean_TE, self.Rtot_TE, bounds_error=False, fill_value="extrapolate")
         Rtot_func = interpolate.interp1d(self.s_top_TE, self.Rtot_TE, bounds_error=False, fill_value="extrapolate")
         self.Rtot_solution = Rtot_func(self.S_solution)
 

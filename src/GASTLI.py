@@ -229,7 +229,7 @@ class int_planet:
         print("Input Zenv = ", self.Zenv)
         """
         print("")
-        print("Running interior structure model")
+        print("GASTLI.py: Running interior structure model")
 
         # Output parameters
         m_pout, x_coreout, x_h2oout, r_pout, fesiout, rhoout, rout, interfaceout, intrf_hist, iter_num,\

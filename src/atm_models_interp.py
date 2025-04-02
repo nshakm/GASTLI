@@ -255,14 +255,14 @@ class atm_models_interp:
         self.temperature_func = RegularGridInterpolator((self.CO_atm,self.FeH_atm,self.logg_atm,self.Teq_atm,self.Tint_atm,\
                                                         press_atm_file), self.data_set_atm, bounds_error=False,\
                                                         fill_value=None)
-
+        print("atm_models_interp.py: temperature_func defined")
 
         # Create atm. data function: abundances
         self.metal_mass_fraction_func = RegularGridInterpolator((self.CO_atm,self.FeH_atm,self.logg_atm,self.Teq_atm,\
                                                         self.Tint_atm, press_atm_file), \
                                                         self.data_set_metal_mass_fractions, bounds_error=False,\
                                                         fill_value=None)
-
+        print("atm_models_interp.py: metal_mass_fraction_func defined")
 
         # Load EOS data
 
@@ -381,16 +381,16 @@ class atm_models_interp:
 
         # Extrapolation warnings
         if self.CO < min(self.CO_atm) or self.CO > max(self.CO_atm):
-            print("C/O is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: C/O is out of atmospheric grid limits. Extrapolating")
 
         if self.log_FeH < min(self.FeH_atm) or self.log_FeH > max(self.FeH_atm):
-            print("Fe/H is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Fe/H is out of atmospheric grid limits. Extrapolating")
 
         if self.Teq_pl < min(self.Teq_atm) or self.Teq_pl > max(self.Teq_atm):
-            print("Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
 
         if logg_pl < min(self.logg_atm) or logg_pl > max(self.logg_atm):
-            print("Surface gravity is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Surface gravity is out of atmospheric grid limits. Extrapolating")
 
 
         self.Pprofile = self.press_atm
@@ -399,6 +399,7 @@ class atm_models_interp:
 
 
         if np.isnan(self.MMF_surf):
+            raise ValueError("atm_models_interp.py: No atmospheric models available for this case (np.nan in grid).")
             Teq_node = maxloc(self.Teq_atm, self.Teq_pl)
             logg_node = maxloc(self.logg_atm, logg_pl)
             FeH_node = maxloc(self.FeH_atm, self.log_FeH)
@@ -482,6 +483,8 @@ class atm_models_interp:
             self.CO = CO_def
             # set metal mass fraction profile
             self.MMF_profile = np.ones(self.npoints)*self.Zenv_pl
+            self.MMF_surf = self.Zenv_pl
+            print(f"atm_models_interp.py: MMF_surf = {self.MMF_surf:.1e}")
             self.P_surf = P_surf
         else:
             """
@@ -512,16 +515,16 @@ class atm_models_interp:
 
         # Extrapolation warnings
         if self.CO < min(self.CO_atm) or self.CO > max(self.CO_atm):
-            print("C/O is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: C/O is out of atmospheric grid limits. Extrapolating")
 
         if self.log_FeH < min(self.FeH_atm) or self.log_FeH > max(self.FeH_atm):
-            print("Fe/H is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Fe/H is out of atmospheric grid limits. Extrapolating")
 
         if self.Teq_pl < min(self.Teq_atm) or self.Teq_pl > max(self.Teq_atm):
-            print("Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
 
         if logg_pl < min(self.logg_atm) or logg_pl > max(self.logg_atm):
-            print("Surface gravity is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Surface gravity is out of atmospheric grid limits. Extrapolating")
 
 
         '''
@@ -549,6 +552,7 @@ class atm_models_interp:
             self.Psurf = self.Pprofile[-1]
 
             if np.isnan(self.Tsurf):
+                raise ValueError("atm_models_interp.py: No atmospheric models available for this case (np.nan in grid).")
                 Teq_node = maxloc(self.Teq_atm, self.Teq_pl)
                 logg_node = maxloc(self.logg_atm, logg_pl)
                 FeH_node = maxloc(self.FeH_atm, self.log_FeH)
@@ -628,6 +632,11 @@ class atm_models_interp:
         Rbulk_inm = self.Rbulk_pl*Rjup         # In m
 
         Mbulk =  ( ((g0/100)/9.8) * (Rbulk_inm/Rearth)**2 )  # In Mearth units
+ 
+        # if not hasattr(self, 'MMF_surf') or self.MMF_surf is None:
+        #     print("atm_models_interp does not have attribute MMF_surf")
+        #     print(f"assigning MMF_surf = Zenv_pl = {self.Zenv_pl:.5f} \n")
+        #     self.MMF_surf = self.Zenv_pl
 
         Z = self.MMF_surf
         mu = Z * 18. + (1 - Z) * 2.33
@@ -653,6 +662,7 @@ class atm_models_interp:
                                                                reference_radius_cm,
                                                                pressures_cgs,
                                                                variable_gravity=True)
+        print("atm_models_interp.py: radius_planet calculated")
 
         self.r = radius_planet/100
         self.P_ode = self.Pprofile * 1e5
