@@ -28,7 +28,8 @@ class thermal_evolution:
                 core mass fraction is very low (< 0.03 approx.) and/or planet is low mass (15-20 Earth masses approx.)
         """
 
-        print("\n\n\nREPO GASTLI\n\n\n")
+        # print("\n\n\nREPO GASTLI mkc mkc mkc\n\n\n")
+        print("\n\n\n...Running modified version of GASTLI...\n\n\n")
 
         # print("1. RGI np.nan\n\n\n")
         # print("2. RGI np.nan + no sys.exit(1)\n\n\n")
