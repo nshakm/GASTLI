@@ -219,6 +219,9 @@ class atm_models_interp:
         - Initialises parameters
         - Loads in data from atmospheric models and water and H/He EOS
         '''
+
+        print("\n\n\n....branch: modified_guillot -> atm_models_interp.py....\n\n\n")
+
         # Planet parameters
         self.T_int_pl = 0.0         # K
         self.g_surf_pl = 0.0        # cgs
