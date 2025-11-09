@@ -148,7 +148,7 @@ class thermal_evolution:
 
 
         for i in range(0,n_therm):
-
+            print("--------------------------")
             print("Model # ", i+1, " in total time sequence of ", n_therm)
             print("Internal temperature [K] = ", self.Tint_array[i])
             print("")
