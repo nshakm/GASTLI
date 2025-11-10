@@ -24,7 +24,9 @@ class coupling:
 
     def __init__(self,name_grid=None,pow_law_formass=0.32,j_max=30):
 
-        print("\n\n\n....branch: modified_guillot -> Coupling.py....\n\n\n")
+        # print("\n\n\n....branch: modified_guillot -> Coupling.py....\n\n\n")
+        print("Coupling.py (branch: modified_guillot)")
+
 
         self.pow_law_formass = pow_law_formass
         #self.path_to_file = path_to_file

@@ -37,7 +37,8 @@ class int_planet:
                  pow_law=0.32, chk_EOS=0, EOS_lim_P=[5e11, 5e11, 5e11, 5e11, \
                                                      5e11, 5e11, 5e11, 5e11, 5e11, 5e11], corEOS=1):
 
-        print("\n\n\n....branch: modified_guillot -> GASTLI.py....\n\n\n")
+        # print("\n\n\n....branch: modified_guillot -> GASTLI.py....\n\n\n")
+        print("GASTLI.py (branch: modified_guillot)")
 
         # Arguments of __init__
         path_to_file = os.environ["GASTLI_input_data_path"]
