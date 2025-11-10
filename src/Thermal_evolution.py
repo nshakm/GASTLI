@@ -28,7 +28,7 @@ class thermal_evolution:
         """
 
         # print("\n\n\n....branch: modified_guillot -> Thermal evolution.py....\n\n\n")
-        print("Thermal_evolution.py (branch: modified_guillot)")
+        print("(branch: modified_guillot) Thermal_evolution.py initialised")
 
         self.pow_law_formass = pow_law_formass
 
