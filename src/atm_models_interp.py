@@ -497,6 +497,7 @@ class atm_models_interp:
             self.CO = CO_def
             # set metal mass fraction profile
             self.MMF_profile = np.ones(self.npoints)*self.Zenv_pl
+            self.MMF_surf = self.Zenv_pl
             self.P_surf = P_surf
         else:
             """
