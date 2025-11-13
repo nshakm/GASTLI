@@ -28,7 +28,7 @@ class thermal_evolution:
         """
 
         # print("\n\n\n....branch: modified_guillot -> Thermal evolution.py....\n\n\n")
-        print("(branch: modified_guillot) Thermal_evolution.py initialised")
+        print("(branch: modified_guillot) Thermal_evolution.py initialised\n")
 
         self.pow_law_formass = pow_law_formass
 
@@ -150,12 +150,15 @@ class thermal_evolution:
 
         for i in range(0,n_therm):
             print("--------------------------")
-            print("Model # ", i+1, " in total time sequence of ", n_therm)
-            print("Internal temperature [K] = ", self.Tint_array[i])
+            # print("Model # ", i+1, " in total time sequence of ", n_therm)
+            # print("Internal temperature [K] = ", self.Tint_array[i])
+            print("Thermal_evolution.py: Model # ", i+1, " in total time sequence of ", n_therm)
+            print("Thermal_evolution.py: Internal temperature [K] = ", self.Tint_array[i])
             print("")
 
             # Putting it here adds 1-2 secs more per each Tint computation, but it is safer
             # Create coupling class
+            print(f"Thermal_evolution.py: Creating coupling class with pow_law_formass = {self.pow_law_formass:.3f}")
             self.my_coupling = cpl.coupling(pow_law_formass=self.pow_law_formass,\
                                             name_grid=name_grid,j_max=j_max)
 
@@ -172,22 +175,24 @@ class thermal_evolution:
 
             # Call to interior model
             if FeH_flag==True:
+                # print("Thermal_evolution.py: calc_PTprofile with FeH_flag = True")
                 self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
                                       log_FeH=self.logFeH, Tguess=Tguess, Rguess=Rguess,\
                                       tolerance=tolerance_for_this_run,
                                       guillot=guillot,P_surf=Psurf_for_this_run,
                                       kappa_IR=kappa_IR,gamma=gamma)
             else:
+                # print("Thermal_evolution.py: calc_PTprofile with FeH_flag = False")
                 self.my_coupling.main(self.M_P, self.x_core, self.Teq, self.Tint_array[i], CO=self.CO,\
                                       FeH_flag=False, Zenv=self.Zenv, Rguess=Rguess,\
                                       Tguess=Tguess, tolerance=tolerance_for_this_run,
                                       guillot=guillot,P_surf=Psurf_for_this_run,
                                       kappa_IR=kappa_IR,gamma=gamma)
             
-            print(f"Thermal_evolution.py: my_coupling.main successful")
+            print(f"Thermal_evolution.py: my_coupling.main done!")
 
             self.alpha = self.my_coupling.pow_law_formass
-            print(f"Thermal_evolution.py: power law for mass - alpha = {self.alpha:.3f}")
+            print(f"Thermal_evolution.py: powe_law_formass: alpha = {self.alpha:.3f}")
 
 
             # Entropy
@@ -266,9 +271,14 @@ class thermal_evolution:
         self.S0 = S0
 
         # dS/dt
+        print("Thermal evolution.py: Trying 1/f_S...")
         inv_f_S = 1 / self.f_S
+        print("Thermal evolution.py: 1/f_S is ok!")
+
         #dSdt_func_interp = interpolate.interp1d(self.s_mean_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        print("Thermal evolution.py: Trying dSdt_func_interp...")
         dSdt_func_interp = interpolate.interp1d(self.s_top_TE, inv_f_S, bounds_error=False, fill_value="extrapolate")
+        print("Thermal evolution.py: dSdt_func_interp is ok!")
 
         def dSdt_func(y, t):
             '''

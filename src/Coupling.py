@@ -25,7 +25,7 @@ class coupling:
     def __init__(self,name_grid=None,pow_law_formass=0.32,j_max=30):
 
         # print("\n\n\n....branch: modified_guillot -> Coupling.py....\n\n\n")
-        print("(branch: modified_guillot) Coupling.py initialised")
+        print("(branch: modified_guillot) Coupling.py initialised\n")
 
 
         self.pow_law_formass = pow_law_formass
@@ -34,6 +34,7 @@ class coupling:
         self.j_max = j_max
 
         # Initialise interior model
+        print(f"Coupling.py: Creating coupling class with pow_law_formass = {self.pow_law_formass:.3f}")
         self.myplanet = int_planet(pow_law=self.pow_law_formass, j_max=self.j_max)
 
         self.myplanet.setup_parameters()
@@ -166,9 +167,10 @@ class coupling:
                 # Re-initialise everything again
                 ## Interior class
                 self.pow_law_formass = self.pow_law_formass - 0.005
-                print('Readjusting mass power law to ', self.pow_law_formass)
+                print('Coupling.py: Readjusting mass power law to ', self.pow_law_formass)
                 #print(self.path_to_file)
                 #print(self.pow_law_formass)
+                print(f"Coupling.py: Re-initialising interior model with power law = {self.pow_law_formass:.3f}")
                 self.myplanet = int_planet(pow_law=self.pow_law_formass)
                 self.myplanet.setup_parameters()
 
@@ -200,10 +202,12 @@ class coupling:
                 self.myatmmodel.calc_interior_mass_fraction(self.Tint, self.g_surf_planet, self.Teq, self.CO_pl,\
                                                             self.log_FeH,P_surf=P_surf)
                 self.Zenv = self.myatmmodel.MMF_surf
+                print("Coupling.py: MMF_surf intialised!")
 
 
 
             self.myplanet.calc_radius(self.M_P,self.x_core,x_H2O,self.T_surf,P_surf*1e5,self.Zenv)
+            print("Coupling.py: calc_radius done!")
 
             """
             print('')
@@ -233,6 +237,7 @@ class coupling:
             else:
                 self.myatmmodel.calc_PTprofile(self.Tint, self.g_surf_planet, self.Teq, self.Zenv, FeH_flag=False,CO_def=self.CO_pl,
                 guillot=guillot,P_surf=P_surf,kappa_IR=kappa_IR,gamma=gamma)
+            print("Coupling.py: calc_PTprofile done!")
 
             """
             print('Atm. models from prt')
@@ -254,7 +259,7 @@ class coupling:
 
 
         print("")
-        print("Convergence reached in surface temperature and bulk radius")
+        print("Coupling.py: Convergence reached in surface temperature and bulk radius")
         print("")
 
         #print("Tsurf_arr = ", Tsurf_arr)
@@ -282,8 +287,10 @@ class coupling:
         self.CMF_conv = (M_P*x_core)/self.Mtot
         
         self.myatmmodel.calc_thickness(self.Rbulk_Rjup, self.Matm_earthunits, Z_atm=self.Zenv)
+        print("Coupling.py: calc_thickness done!")
 
         self.Rtot = self.myatmmodel.total_radius
+        print("Coupling.py: R_tot calculated!")
         """
         self.r_atm_profile = self.myatmmodel.r
         self.g_atm_profile = self.myatmmodel.g_ode

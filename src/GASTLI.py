@@ -38,8 +38,9 @@ class int_planet:
                                                      5e11, 5e11, 5e11, 5e11, 5e11, 5e11], corEOS=1):
 
         # print("\n\n\n....branch: modified_guillot -> GASTLI.py....\n\n\n")
-        print("(branch: modified_guillot) GASTLI.py initialised")
+        print("(branch: modified_guillot) GASTLI.py initialised\n")
 
+        print("GASTLI.py: Initialising interior structure model from int_planet...")
         # Arguments of __init__
         path_to_file = os.environ["GASTLI_input_data_path"]
         os_path = path_to_file
@@ -84,21 +85,25 @@ class int_planet:
         self.logT_sesame,self.logP_sesame,self.logrho_sesame,self.logS_sesame,\
         self.dlrho_dlT_p_sesame,self.dlS_dlT_p_sesame,\
         self.dlrho_dlP_t_sesame = fi.read_eos_sesame(self.path_to_file)
+        print("GASTLI.py: SESAME rock EOS data loaded!")
 
         # Water EOS from Mazevet+19 (only the density, for optimization)
         self.P_maz_water,self.T_maz_water,\
         self.rho_maz_water = fi.read_mazevet_water(self.path_to_file)
+        print("GASTLI.py: Mazevet+19 water EOS data loaded!")
 
         # H/He EOS from Chabrier+23
         self.logT_input,self.logP_input,self.logrho_input,\
         self.logrho_ch,self.logU_ch,self.logP_ch,self.logS_ch,\
         self.dlrho_dlT_P,self.dlrho_dlP_T,self.dlS_dlT_P,self.grad_ad,\
         self.grad_ad_PT = fi.read_eos_ch(self.path_to_file)
+        print("GASTLI.py: Chabrier+23 H/He EOS data loaded!")
 
 
         # H/He EOS correction from Howard & Guillot 2023
         self.logP_HG,self.logT_HG,\
         self.Vmix_HG, self.Smix_HG = fi.read_hg23_corr(self.path_to_file)
+        print("GASTLI.py: Howard & Guillot 2023 H/He EOS correction data loaded!")
 
 
         # Initialise parameters
@@ -127,6 +132,8 @@ class int_planet:
         self.rho = np.array(np.zeros(self.n_pts))
         self.cv = np.array(np.zeros(self.n_pts))
         self.r = np.array(np.zeros(self.n_pts))
+
+        print("GASTLI.py: Interior structure model initialised successfully in int_planet!")
 
 
         #############################
@@ -234,6 +241,7 @@ class int_planet:
         print("Running interior structure model")
 
         # Output parameters
+        print(f"GASTLI.py: Calling gastli_interior_subroutine for pow_law_formass = {self.pow_law:.3f}...")
         m_pout, x_coreout, x_h2oout, r_pout, fesiout, rhoout, rout, interfaceout, intrf_hist, iter_num,\
         gout, tout, pout, rhoarrout, cvout, Sout,\
         OtoHout, metalout = interior.gastli_interior_subroutine(self.j_max,\

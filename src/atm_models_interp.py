@@ -221,7 +221,7 @@ class atm_models_interp:
         '''
 
         # print("\n\n\n....branch: modified_guillot -> atm_models_interp.py....\n\n\n")
-        print("(branch: modified_guillot) atm_models_interp.py initialised")
+        print("(branch: modified_guillot) atm_models_interp.py initialised\n")
 
 
         # Planet parameters
@@ -260,6 +260,7 @@ class atm_models_interp:
         self.temperature_func = RegularGridInterpolator((self.CO_atm,self.FeH_atm,self.logg_atm,self.Teq_atm,self.Tint_atm,\
                                                         press_atm_file), self.data_set_atm, bounds_error=False,\
                                                         fill_value=None)
+        print("atm_models_interp.py: temperature_func defined")
 
 
         # Create atm. data function: abundances
@@ -267,6 +268,7 @@ class atm_models_interp:
                                                         self.Tint_atm, press_atm_file), \
                                                         self.data_set_metal_mass_fractions, bounds_error=False,\
                                                         fill_value=None)
+        print("atm_models_interp.py: metal_mass_fraction_func defined")
 
 
         # Load EOS data
@@ -386,16 +388,16 @@ class atm_models_interp:
 
         # Extrapolation warnings
         if self.CO < min(self.CO_atm) or self.CO > max(self.CO_atm):
-            print("C/O is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: C/O is out of atmospheric grid limits. Extrapolating")
 
         if self.log_FeH < min(self.FeH_atm) or self.log_FeH > max(self.FeH_atm):
-            print("Fe/H is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Fe/H is out of atmospheric grid limits. Extrapolating")
 
         if self.Teq_pl < min(self.Teq_atm) or self.Teq_pl > max(self.Teq_atm):
-            print("Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
 
         if logg_pl < min(self.logg_atm) or logg_pl > max(self.logg_atm):
-            print("Surface gravity is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Surface gravity is out of atmospheric grid limits. Extrapolating")
 
 
         self.Pprofile = self.press_atm
@@ -429,8 +431,8 @@ class atm_models_interp:
             maxTint = np.array(maxTint_list)
             Tint_limit = min(maxTint)
 
-            print("No atmospheric models available for this case (np.nan in grid).")
-            print("Decrease the interior temperature or increase the surface pressure")
+            print("atm_models_interp.py: No atmospheric models available for this case (np.nan in grid).")
+            print("atm_models_interp.py: Decrease the interior temperature or increase the surface pressure")
             #print("Decrease the interior temperature below ", Tint_limit, "K")
             sys.exit(1)
 
@@ -493,11 +495,13 @@ class atm_models_interp:
             # Calculate from Fortney+ 2013 approximation
             self.Zenv_pl = Zenv
             self.log_FeH = np.log10(O_to_H_molecular(self.Zenv_pl) / O_to_H_sun)
+            print(f"atm_models_interp.py: Calculated log(Fe/H) = {self.log_FeH:.2f} from Zenv = {self.Zenv_pl:.2f}")
             # Set CO
             self.CO = CO_def
             # set metal mass fraction profile
             self.MMF_profile = np.ones(self.npoints)*self.Zenv_pl
             self.MMF_surf = self.Zenv_pl
+            print(f"atm_models_interp.py: MMF_surf = {self.MMF_surf:.1e}")
             self.P_surf = P_surf
         else:
             """
@@ -528,16 +532,16 @@ class atm_models_interp:
 
         # Extrapolation warnings
         if self.CO < min(self.CO_atm) or self.CO > max(self.CO_atm):
-            print("C/O is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: C/O is out of atmospheric grid limits. Extrapolating")
 
         if self.log_FeH < min(self.FeH_atm) or self.log_FeH > max(self.FeH_atm):
-            print("Fe/H is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Fe/H is out of atmospheric grid limits. Extrapolating")
 
         if self.Teq_pl < min(self.Teq_atm) or self.Teq_pl > max(self.Teq_atm):
-            print("Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Equilibrium temperature is out of atmospheric grid limits. Extrapolating")
 
         if logg_pl < min(self.logg_atm) or logg_pl > max(self.logg_atm):
-            print("Surface gravity is out of atmospheric grid limits. Extrapolating")
+            print("atm_models_interp.py: Surface gravity is out of atmospheric grid limits. Extrapolating")
 
 
         '''
@@ -547,8 +551,10 @@ class atm_models_interp:
         if guillot==True:
             gravity = 1e1 ** logg_pl
 
+            print("atm_models_interp.py: Initialising Guillot 2010 atmospheric profile...")
             Guillot10_model = Guillot10.guillot_global(self.press_atm, kappa_IR, gamma, gravity,\
                                                         self.T_int_pl, self.Teq_pl)
+            print("atm_models_interp.py: Using Guillot 2010 atmospheric profile!")
 
             self.Pprofile = self.press_atm
             self.Tprofile = Guillot10_model
@@ -597,8 +603,8 @@ class atm_models_interp:
                 maxTint = np.array(maxTint_list)
                 Tint_limit = min(maxTint)
 
-                print("No atmospheric models available for this case (np.nan in grid).")
-                print("Decrease the interior temperature or decrease the surface pressure")
+                print("atm_models_interp.py: No atmospheric models available for this case (np.nan in grid).")
+                print("atm_models_interp.py: Decrease the interior temperature or decrease the surface pressure")
                 #print("Decrease the interior temperature below ", Tint_limit, "K")
                 sys.exit(1)
 
@@ -667,6 +673,7 @@ class atm_models_interp:
                                                                reference_radius_cm,
                                                                pressures_cgs,
                                                                variable_gravity=True)
+        print("atm_models_interp.py: radius_planet calculated!")
 
         self.r = radius_planet/100
         self.P_ode = self.Pprofile * 1e5
