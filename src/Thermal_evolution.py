@@ -183,6 +183,11 @@ class thermal_evolution:
                                       Tguess=Tguess, tolerance=tolerance_for_this_run,
                                       guillot=guillot,P_surf=Psurf_for_this_run,
                                       kappa_IR=kappa_IR,gamma=gamma)
+            
+            print(f"Thermal_evolution.py: my_coupling.main successful")
+
+            self.alpha = self.my_coupling.pow_law_formass
+            print(f"Thermal_evolution.py: power law for mass - alpha = {self.alpha:.3f}")
 
 
             # Entropy
