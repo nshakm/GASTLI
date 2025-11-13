@@ -38,7 +38,7 @@ class int_planet:
                                                      5e11, 5e11, 5e11, 5e11, 5e11, 5e11], corEOS=1):
 
         # print("\n\n\n....branch: modified_guillot -> GASTLI.py....\n\n\n")
-        print("\n(branch: modified_guillot) GASTLI.py initialised")
+        print("\n-----(branch: modified_guillot) GASTLI.py initialised-----")
 
         print("GASTLI.py: Initialising interior structure model from int_planet...")
         # Arguments of __init__

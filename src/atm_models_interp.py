@@ -221,7 +221,7 @@ class atm_models_interp:
         '''
 
         # print("\n\n\n....branch: modified_guillot -> atm_models_interp.py....\n\n\n")
-        print("\n(branch: modified_guillot) atm_models_interp.py initialised")
+        print("\n-----(branch: modified_guillot) atm_models_interp.py initialised-----")
 
 
         # Planet parameters
@@ -495,7 +495,7 @@ class atm_models_interp:
             # Calculate from Fortney+ 2013 approximation
             self.Zenv_pl = Zenv
             self.log_FeH = np.log10(O_to_H_molecular(self.Zenv_pl) / O_to_H_sun)
-            print(f"atm_models_interp.py: Calculated log(Fe/H) = {self.log_FeH:.2f} from Zenv = {self.Zenv_pl:.2f}")
+            print(f"atm_models_interp.py: Calculated log(Fe/H) = {self.log_FeH:.2f} from Zenv = {self.Zenv_pl:.1e}")
             # Set CO
             self.CO = CO_def
             # set metal mass fraction profile

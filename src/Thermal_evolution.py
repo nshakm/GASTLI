@@ -28,7 +28,7 @@ class thermal_evolution:
         """
 
         # print("\n\n\n....branch: modified_guillot -> Thermal evolution.py....\n\n\n")
-        print("\n(branch: modified_guillot) Thermal_evolution.py initialised")
+        print("\n-----(branch: modified_guillot) Thermal_evolution.py initialised-----")
 
         self.pow_law_formass = pow_law_formass
 
@@ -149,7 +149,7 @@ class thermal_evolution:
 
 
         for i in range(0,n_therm):
-            print("--------------------------")
+            print("-"*15)
             # print("Model # ", i+1, " in total time sequence of ", n_therm)
             # print("Internal temperature [K] = ", self.Tint_array[i])
             print("Thermal_evolution.py: Model # ", i+1, " in total time sequence of ", n_therm)
