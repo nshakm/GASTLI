@@ -221,7 +221,7 @@ class atm_models_interp:
         '''
 
         # print("\n\n\n....branch: modified_guillot -> atm_models_interp.py....\n\n\n")
-        print("(branch: modified_guillot) atm_models_interp.py initialised\n")
+        print("\n(branch: modified_guillot) atm_models_interp.py initialised")
 
 
         # Planet parameters
