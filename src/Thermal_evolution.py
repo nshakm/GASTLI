@@ -192,7 +192,7 @@ class thermal_evolution:
             print(f"Thermal_evolution.py: my_coupling.main done!")
 
             self.alpha = self.my_coupling.pow_law_formass
-            print(f"Thermal_evolution.py: powe_law_formass: alpha = {self.alpha:.3f}")
+            print(f"Thermal_evolution.py: power_law_formass: alpha = {self.alpha:.3f} \n")
 
 
             # Entropy
