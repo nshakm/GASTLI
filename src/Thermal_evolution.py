@@ -28,14 +28,15 @@ class thermal_evolution:
         """
 
         # print("\n\n\n....branch: modified_guillot -> Thermal evolution.py....\n\n\n")
-        print("\n-----(branch: modified_guillot) Thermal_evolution.py initialised-----")
+        print("\n-----(branch: modified_mean_radius) Thermal_evolution.py initialised-----")
 
         self.pow_law_formass = pow_law_formass
 
 
         # Constants for thermal evolution
         self.sigma = 5.67051e-8              # W/m2/K4
-        self.R_jup = 11.2
+        # self.R_jup = 11.2
+        self.R_jup = 10.97
         self.R_earth = 6.371e6               # m
         self.s_conv = 365 * 24 * 3600 * 1e9
         self.m_h = 1.660e-27                 # In kg
@@ -46,7 +47,7 @@ class thermal_evolution:
 
 
 
-    def main(self,M_P,x_core,Teq,Tint_array,CO=0.55,log_FeH=0.,Zenv=0.03,FeH_flag=True,Tguess=2000.,Rguess=11.2,\
+    def main(self,M_P,x_core,Teq,Tint_array,CO=0.55,log_FeH=0.,Zenv=0.03,FeH_flag=True,Tguess=2000.,Rguess=10.97,\
              tolerance=1e-3,guillot=False,P_surf=1e3,kappa_IR=0.01,gamma=0.4,name_grid=None,j_max=30):
         r"""Function that runs a series of interior structure models at different internal temperatures and gets
             the entropies. Necessary to run before solving the luminosity differential equation (thermal evolution).

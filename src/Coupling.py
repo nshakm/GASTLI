@@ -50,7 +50,7 @@ class coupling:
         self.Mearth = 5.972e24       # In m
 
 
-    def main(self,M_P,x_core,Teq,Tint,CO=0.55,log_FeH=0.,Zenv=0.03,FeH_flag=True,Tguess=2000.,Rguess=11.2,\
+    def main(self,M_P,x_core,Teq,Tint,CO=0.55,log_FeH=0.,Zenv=0.03,FeH_flag=True,Tguess=2000.,Rguess=10.97,\
              tolerance=1e-3,guillot=False,P_surf=1e3,kappa_IR=0.01,gamma=0.4):
         r"""Function that runs coupled interior-atmosphere model
             ## Output parameters of atmosphere class ##
@@ -92,7 +92,7 @@ class coupling:
             Tguess (optional):
                 Initial guess for the surface temperature in K. Default is 2000 K.
             Rguess (optional):
-                Initial guess for planet radius in Earth radii. Default is 11.2 Earth radii (Jupiter's
+                Initial guess for planet radius in Earth radii. Default is 10.97 Earth radii (Jupiter's
                 radius). Changing it may speed up calculations when FeH_flag = True.
             tolerance (optional):
                 maximum relative difference in radius between interior-atm. steps. Default is 0.001
@@ -273,8 +273,9 @@ class coupling:
         print("# iterations = ", counter)
         """
         # Final radius
-        Rjup = 7.149e7    # Jupiter radius in m
-        Rearth = 6.371e6  # Earth radius in m
+        # Rjup = 7.149e7    # Jupiter radius in m (equator)
+        Rjup = 6.9911e7    # Jupiter radius in m (mean)
+        Rearth = 6.371e6  # Earth radius in m (mean)
 
         self.Rbulk_Rjup = R_arr[counter]*Rearth/Rjup
 

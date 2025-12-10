@@ -636,7 +636,8 @@ class atm_models_interp:
                 Atmospheric thickness in Jupiter radii
         '''
 
-        Rjup = 7.149e7                         # Jupiter radius in m
+        # Rjup = 7.149e7                         # Jupiter radius in m (equator)
+        Rjup = 6.9911e7                        # Jupiter radius in m (mean)
         Mjup = 1.899e27                        # Jupiter mass in kg
         Rearth = 6.371e6                       # Earth radius in m
         Mearth = 5.972e24                      # Earth mass in kg
